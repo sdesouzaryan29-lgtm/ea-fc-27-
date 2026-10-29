@@ -1,0 +1,56 @@
+
+name: Build FC 27 Hub APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project ZIP
+        run: |
+          unzip fc27-hub-projeto-android-apk.zip -d extracted
+          mkdir build
+          cp -a extracted/fc27_android/. build/
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install dependencies
+        working-directory: build
+        run: npm install
+
+      - name: Generate Android project
+        working-directory: build
+        run: npx cap add android
+
+      - name: Sync Android project
+        working-directory: build
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: build/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FC-27-Hub-debug-APK
+          path: build/android/app/build/outputs/apk/debug/app-debug.apk
