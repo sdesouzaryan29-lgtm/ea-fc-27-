@@ -18,7 +18,7 @@ jobs:
 
       - name: Extract project ZIP
         run: |
-          unzip fc27-hub-projeto-android-apk.zip -d extracted
+         unzip fc27-hub-atualizado.zip -d extracted
           mkdir build
           cp -a extracted/fc27_android/. build/
 
